@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Guest link maker</title>
+<style>
+:root{--bg:#f6f9ff;--ink:#1f3558;--blue:#3f6fd8;--card:#fff;--line:#a9c1f0}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1d38;--ink:#eef4ff;--blue:#8fb2ff;--card:#1b3366;--line:#4a6bb5}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 Georgia,serif;padding:1rem}
+main{max-width:620px;margin:auto}h1{color:var(--blue);font-size:1.6rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem;margin:.8rem 0}
+input,select,button{font:inherit;padding:.6rem .8rem;border-radius:12px;border:1px solid var(--line);width:100%;margin:.3rem 0;background:var(--card);color:var(--ink)}
+button{background:var(--blue);color:#fff;border:0;cursor:pointer;font-weight:700}
+.g{display:flex;gap:.5rem}.s{font-size:.85rem;opacity:.8;word-break:break-all}.w{background:#25a55a}.x{background:#c0504d}
+</style></head><body><main>
+<h1>Guest link maker</h1>
+<p class="s">Type a guest's name, add them, then send their personal invitation on WhatsApp. Their name will appear as "Dear ..." when they open it.</p>
+<div class="card">
+<select id="t"><option value="Mr">Mr.</option><option value="Mrs">Mrs.</option><option value="Both" selected>Mr. &amp; Mrs.</option><option value="Family">All the family</option></select>
+<input id="n" placeholder="Guest name (e.g. Perera)" maxlength="30">
+<input id="p" placeholder="WhatsApp number (optional, e.g. 0771234567)" inputmode="tel">
+<button id="a">Add guest</button></div>
+<div id="l"></div>
+</main>
+<script>
+var BASE="https://chathumunasinghe.github.io/wedding/",L=[],$=function(i){return document.getElementById(i)};
+try{L=JSON.parse(localStorage.getItem("g")||"[]")}catch(e){}
+function who(g){return g.t==="Family"?"The "+g.n+" Family":(g.t==="Mr"?"Mr. ":g.t==="Mrs"?"Mrs. ":"Mr. & Mrs. ")+g.n}
+function link(g){return BASE+"#"+g.t+"_"+encodeURIComponent(g.n.trim().replace(/\s+/g,"-"))}
+function msg(g){return "Dear "+who(g)+", with joy and blessings we invite you to the wedding of Kavishka & Ashani on Saturday, 9 January 2027. Please open your invitation here: "+link(g)}
+function save(){try{localStorage.setItem("g",JSON.stringify(L))}catch(e){}}
+function draw(){$("l").innerHTML="";L.forEach(function(g,i){var d=document.createElement("div");d.className="card";
+d.innerHTML="<b>Dear "+who(g).replace(/</g,"&lt;")+"</b><div class='s'>"+link(g).replace(/</g,"&lt;")+"</div><div class='g'><button data-c='"+i+"'>Copy link</button><button class='w' data-w='"+i+"'>WhatsApp</button><button class='x' data-x='"+i+"'>Remove</button></div>";$("l").appendChild(d)})}
+$("a").onclick=function(){var n=$("n").value.trim();if(!n)return;L.unshift({t:$("t").value,n:n,p:$("p").value});$("n").value=$("p").value="";save();draw()};
+$("l").onclick=function(e){var b=e.target,c=b.getAttribute("data-c"),w=b.getAttribute("data-w"),x=b.getAttribute("data-x");
+if(c!==null){try{navigator.clipboard.writeText(link(L[c]));b.textContent="Copied ✓"}catch(er){b.textContent="Select the link above"}}
+if(w!==null){var g=L[w],p=(g.p||"").replace(/\D/g,"");if(p[0]==="0")p="94"+p.slice(1);window.open("https://wa.me/"+p+"?text="+encodeURIComponent(msg(g)),"_blank")}
+if(x!==null){L.splice(x,1);save();draw()}};
+draw();
+</script></body></html>
